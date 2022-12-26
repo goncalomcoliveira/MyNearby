@@ -37,30 +37,28 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
         //setContentView(R.layout.activity_main)                //change Activity look to the design in activity_main.xml
         setContentView(binding.root)                            //change Activity look to the root design of our binding
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
         checkPermissionsForLocation()
     }
 
     /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
+     * Obtains the [SupportMapFragment] and gets notified when the map is ready to be used.
+     */
+    private fun notifyMapIsReady() {
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    /**
+     * Manipulates the map once notified as available by [notifyMapIsReady].
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val latLng = LatLng(latitude, longitude)
+        mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").snippet("You are here!"))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
     }
 
     /**
@@ -87,7 +85,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
         else {
-            // Get Location
+            getLastLocation()
         }
     }
 
@@ -106,7 +104,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (requestCode == _requestCode && grantResults.isNotEmpty()) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Get Location
+                getLastLocation()
             }
             else {
                 Toast.makeText(this, "Permissions denied!", Toast.LENGTH_SHORT).show()
@@ -115,10 +113,13 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
-     *
+     * Retrieves last known location by setting up a [LocationRequest], running it
+     * through [FusedLocationProviderClient], receiving updating notifications
+     * through [LocationCallback]s that contain [LocationResult]s holding the
+     * relevant location information.
      */
     @SuppressLint("MissingPermission")
-    fun getLastLocation() {
+    private fun getLastLocation() {
 
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .setWaitForAccurateLocation(false)
@@ -139,9 +140,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                             val latestLocationIndex = result.locations.size - 1         //used index approach instead of lasLocation to avoid safe assertion
                             latitude = result.locations[latestLocationIndex].latitude
                             longitude = result.locations[latestLocationIndex].longitude
-                            println(latitude)
-                            println(longitude)
-                            // open map when ready
+                            notifyMapIsReady()
                         }
                     }
                 },
