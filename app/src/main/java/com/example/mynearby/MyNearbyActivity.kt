@@ -1,9 +1,11 @@
 package com.example.mynearby
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -15,11 +17,16 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.mynearby.databinding.ActivityMapsBinding
+import com.google.android.gms.location.*
+import kotlin.properties.Delegates
 
 class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    private var latitude by Delegates.notNull<Double>()
+    private var longitude by Delegates.notNull<Double>()
 
     private var _requestCode = 1
 
@@ -57,9 +64,9 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
-     * Checks if location permissions are already granted, requesting
-     * them if not (see [onRequestPermissionsResult]) and proceeding
-     * to the last known location retrieval if they are.
+     * Checks if location permissions are already granted, requesting them if not (see
+     * [onRequestPermissionsResult]) and proceeding to [getLastLocation] if they are
+     * to retrieve the last known location.
      */
     private fun checkPermissionsForLocation() {
         if (ContextCompat.checkSelfPermission(
@@ -85,9 +92,9 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
-     * Overrides the callback for the result from requesting permissions,
-     * notifying the user when the permissions haven't yet been granted and
-     * proceeding to the last known location retrieval if the requested
+     * Overrides the callback for the result from requesting permissions, notifying
+     * the user when the permissions haven't yet been granted and proceeding to
+     * [getLastLocation] to retrieve the last known location if the requested
      * permissions have been granted.
      */
     override fun onRequestPermissionsResult(
@@ -105,5 +112,40 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(this, "Permissions denied!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    /**
+     *
+     */
+    @SuppressLint("MissingPermission")
+    fun getLastLocation() {
+
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+            .setWaitForAccurateLocation(false)
+            .setMinUpdateIntervalMillis(3000)
+            .setMaxUpdateDelayMillis(10000)
+            .build()
+
+        LocationServices.getFusedLocationProviderClient(this)
+            .requestLocationUpdates(
+                locationRequest,
+                object : LocationCallback() {
+                    override fun onLocationResult(result: LocationResult) {
+                        super.onLocationResult(result)
+
+                        LocationServices.getFusedLocationProviderClient(applicationContext)
+                            .removeLocationUpdates(this)
+                        if (result.locations.isNotEmpty()) {
+                            val latestLocationIndex = result.locations.size - 1         //used index approach instead of lasLocation to avoid safe assertion
+                            latitude = result.locations[latestLocationIndex].latitude
+                            longitude = result.locations[latestLocationIndex].longitude
+                            println(latitude)
+                            println(longitude)
+                            // open map when ready
+                        }
+                    }
+                },
+                Looper.getMainLooper()
+            )
     }
 }
