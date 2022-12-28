@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
@@ -55,24 +56,22 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
+     * Initialize the [PlacesClient] for POI [Place] detail retrieval
+     */
+    private fun initPlaces() {
+        if (!Places.isInitialized())
+            Places.initialize(applicationContext, "AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4");
+
+        placesClient = Places.createClient(this)
+    }
+
+    /**
      * Obtains the [SupportMapFragment] and gets notified when the map is ready to be used.
      */
     private fun notifyMapIsReady() {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-    }
-
-    /**
-     * TODO Write doc
-     */
-    private fun initPlaces() {
-        // Initialize the Places client.
-        if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, "AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4");
-        }
-
-        placesClient = Places.createClient(this)
     }
 
     /**
@@ -89,6 +88,14 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 .snippet("You are here!")
         )!!
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+        setPOIOnClickPopup()
+    }
+
+    /**
+     * Sets listeners on the present POI [Marker]s so, when clicked, they call the
+     */
+    private fun setPOIOnClickPopup() {
 
         val placeFields = listOf(
             Place.Field.NAME,
@@ -111,47 +118,39 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
         val token = AutocompleteSessionToken.newInstance()
 
         mMap.setOnPoiClickListener { poi ->
-            val fetchRequest = FetchPlaceRequest.builder(poi.placeId, placeFields).setSessionToken(token).build()
-            val task = placesClient.fetchPlace(fetchRequest)
-            task
-                .addOnSuccessListener { result ->
-                    val place = result.place
-
-                    //Toast.makeText(applicationContext, result.place.phoneNumber, Toast.LENGTH_SHORT).show()
-                    val dialogBuilder = AlertDialog.Builder(this)
-                    val contactPopupView = layoutInflater.inflate(R.layout.popup, null)
-
-                    val popupBuilder = PopupBuilder(contactPopupView, place, placesClient, applicationContext)
-                    popupBuilder.build()
-
-                    dialogBuilder.setView(contactPopupView)
-                    val dialog = dialogBuilder.create()
-                    dialog.show()
-
-                    closeButton = contactPopupView.findViewById(R.id.closeButton)
-                    closeButton.setOnClickListener {
-                        dialog.hide()
-                    }
-                }
-                .addOnFailureListener { e ->
-
-                }
+            showPlacePopup(poi, placeFields, token)
         }
     }
 
     /**
-     * TODO Write doc
+     * Create a [FetchPlaceRequest] in order to retrieve the POI's [Place] details, run said request
+     * and create a new popup window to display the location's information using [PopupBuilder] if
+     * the request task is successful
      */
-    fun markNewCurrentPosition(latitude: Double, longitude: Double) {
-        currentMarker.remove()
-        val latLng = LatLng(latitude, longitude)
-        currentMarker = mMap.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .title("Current Location")
-                .snippet("You are here!")
-        )!!
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+    private fun showPlacePopup(poi: PointOfInterest, placeFields: List<Place.Field>, token: AutocompleteSessionToken) {
+        val fetchRequest = FetchPlaceRequest.builder(poi.placeId, placeFields).setSessionToken(token).build()
+        val task = placesClient.fetchPlace(fetchRequest)
+        task.addOnSuccessListener { result ->
+            val place = result.place
+            val dialogBuilder = AlertDialog.Builder(this)
+            val contactPopupView = layoutInflater.inflate(R.layout.popup, null)
+            val popupBuilder = PopupBuilder(contactPopupView, place, placesClient, applicationContext)
+            popupBuilder.build()
+
+            dialogBuilder.setView(contactPopupView)
+            val dialog = dialogBuilder.create()
+            dialog.show()
+
+            closeButton = contactPopupView.findViewById(R.id.closeButton)
+
+            //Hide popup if close button is clicked
+            closeButton.setOnClickListener {
+                dialog.hide()
+            }
+
+        }.addOnFailureListener {
+            Toast.makeText(applicationContext, "Failed to retrieve this location's details.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
@@ -239,5 +238,20 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 },
                 Looper.getMainLooper()
             )
+    }
+
+    /**
+     * TODO Write doc
+     */
+    fun markNewCurrentPosition(latitude: Double, longitude: Double) {
+        currentMarker.remove()
+        val latLng = LatLng(latitude, longitude)
+        currentMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Current Location")
+                .snippet("You are here!")
+        )!!
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
     }
 }
