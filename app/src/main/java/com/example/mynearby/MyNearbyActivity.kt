@@ -3,40 +3,54 @@ package com.example.mynearby
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
+import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
+import com.example.mynearby.databinding.ActivityMapsBinding
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.mynearby.databinding.ActivityMapsBinding
-import com.google.android.gms.location.*
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.PlacesClient
+import java.util.*
 import kotlin.properties.Delegates
 
 class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private lateinit var placesClient: PlacesClient
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var currentMarker: Marker
 
     private var latitude by Delegates.notNull<Double>()
     private var longitude by Delegates.notNull<Double>()
 
     private var _requestCode = 1
 
+    //popup fields
+    private lateinit var closeButton: ImageButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)   //parse and convert XML layout into layout bindings
-        //setContentView(R.layout.activity_main)                //change Activity look to the design in activity_main.xml
+        //setContentView(R.layout.activity_main)                //change Activity look to the design in activity_maps.xml
         setContentView(binding.root)                            //change Activity look to the root design of our binding
 
+        initPlaces()
         checkPermissionsForLocation()
     }
 
@@ -50,14 +64,93 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
+     * TODO Write doc
+     */
+    private fun initPlaces() {
+        // Initialize the Places client.
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, "AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4");
+        }
+
+        placesClient = Places.createClient(this)
+    }
+
+    /**
      * Manipulates the map once notified as available by [notifyMapIsReady].
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
         val latLng = LatLng(latitude, longitude)
-        mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").snippet("You are here!"))
+        currentMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Current Location")
+                .snippet("You are here!")
+        )!!
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+        val placeFields = listOf(
+            Place.Field.NAME,
+            Place.Field.LAT_LNG,
+            Place.Field.ADDRESS,
+            Place.Field.PHONE_NUMBER,
+            Place.Field.RATING,
+            Place.Field.USER_RATINGS_TOTAL,
+            Place.Field.TYPES,
+            Place.Field.BUSINESS_STATUS,
+            Place.Field.OPENING_HOURS,
+            Place.Field.PRICE_LEVEL,
+            Place.Field.PHOTO_METADATAS,
+            Place.Field.DELIVERY,
+            Place.Field.DINE_IN,
+            Place.Field.TAKEOUT,
+            Place.Field.CURBSIDE_PICKUP
+        )
+
+        val token = AutocompleteSessionToken.newInstance()
+
+        mMap.setOnPoiClickListener { poi ->
+            val fetchRequest = FetchPlaceRequest.builder(poi.placeId, placeFields).setSessionToken(token).build()
+            val task = placesClient.fetchPlace(fetchRequest)
+            task
+                .addOnSuccessListener { result ->
+                    val place = result.place
+
+                    //Toast.makeText(applicationContext, result.place.phoneNumber, Toast.LENGTH_SHORT).show()
+                    val dialogBuilder = AlertDialog.Builder(this)
+                    val contactPopupView = layoutInflater.inflate(R.layout.popup, null)
+
+                    val popupBuilder = PopupBuilder(contactPopupView, place, placesClient, applicationContext)
+                    popupBuilder.build()
+
+                    dialogBuilder.setView(contactPopupView)
+                    val dialog = dialogBuilder.create()
+                    dialog.show()
+
+                    closeButton = contactPopupView.findViewById(R.id.closeButton)
+                    closeButton.setOnClickListener {
+                        dialog.hide()
+                    }
+                }
+                .addOnFailureListener { e ->
+
+                }
+        }
+    }
+
+    /**
+     * TODO Write doc
+     */
+    fun markNewCurrentPosition(latitude: Double, longitude: Double) {
+        currentMarker.remove()
+        val latLng = LatLng(latitude, longitude)
+        currentMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Current Location")
+                .snippet("You are here!")
+        )!!
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
     }
 
