@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+    <!--android:theme="@style/Theme.MyNearby"-->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,14 +15,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyNearby"
+        android:theme="@style/Theme.AppCompat.NoActionBar"
         tools:targetApi="31">
 
         <uses-library android:name="com.google.android.maps" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBvKJfo4HGuH2hGF_VlFBkSDZ7wAx1l5us" /> <!-- Inserted personal Google Maps API credential -->
+            android:value="AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4" /> <!-- Inserted Google Maps API credential -->
 
         <activity
             android:name=".MyNearbyActivity"
