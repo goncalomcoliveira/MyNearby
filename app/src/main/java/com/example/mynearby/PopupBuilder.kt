@@ -1,7 +1,9 @@
 package com.example.mynearby
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
@@ -15,7 +17,7 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import java.util.*
 import kotlin.math.roundToInt
 
-class PopupBuilder(private val contactPopupView : View, private val place: Place, private val placesClient: PlacesClient, private val context: Context) {
+class PopupBuilder(private val contactPopupView : View, private val place: Place, private val placesClient: PlacesClient, private val context: Context, private val layoutInflater: LayoutInflater) {
 
     //popup fields
     private lateinit var popupTitle: TextView
@@ -218,10 +220,6 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
         }
     }
 
-    private fun setSchedule(){
-
-    }
-
     private fun setBusinessStatus() {
         if (place.businessStatus != null) {
             when (place.businessStatus) {
@@ -313,8 +311,6 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
                     .addOnSuccessListener { fetchPhotoResponse: FetchPhotoResponse ->
 
                         val bitmap = fetchPhotoResponse.bitmap
-                        //testPhoto.setImageBitmap(bitmap)
-
 
                         val imageView = ImageView(context)
                         imageView.adjustViewBounds = true
@@ -327,7 +323,6 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
 
                         // Add ImageView to LinearLayout
                         imagesLayout.addView(imageView)
-
 
                     }.addOnFailureListener { exception: Exception ->
                         if (exception is ApiException) {

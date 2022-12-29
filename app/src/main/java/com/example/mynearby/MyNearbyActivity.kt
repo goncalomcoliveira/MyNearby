@@ -5,7 +5,11 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,10 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PointOfInterest
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
@@ -43,6 +44,15 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //popup fields
     private lateinit var closeButton: ImageButton
+
+    private lateinit var goToLocation: ImageButton
+
+    private lateinit var placeName: EditText
+    private lateinit var placeDescription: EditText
+    private lateinit var errorText: TextView
+    private lateinit var createButton: Button
+    private lateinit var closeButtonMarker: ImageButton
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,11 +99,17 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
         )!!
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
 
+        goToLocation = binding.goToLocation
+        goToLocation.setOnClickListener {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.position, 17f))
+        }
+
         setPOIOnClickPopup()
     }
 
     /**
      * Sets listeners on the present POI [Marker]s so, when clicked, they call the
+     * TODO Finish doc
      */
     private fun setPOIOnClickPopup() {
 
@@ -119,6 +135,51 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.setOnPoiClickListener { poi ->
             showPlacePopup(poi, placeFields, token)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(poi.latLng))
+        }
+
+        mMap.setOnMapClickListener { latLng ->
+            createPersonalMarker(latLng)
+        }
+    }
+
+    /**
+     * TODO Write doc
+     */
+    private fun createPersonalMarker(latLng: LatLng) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val createMarkerView = layoutInflater.inflate(R.layout.create_marker, null)
+
+        placeName = createMarkerView.findViewById(R.id.placeName)
+        placeDescription = createMarkerView.findViewById(R.id.placeDescription)
+        createButton = createMarkerView.findViewById(R.id.createButton)
+        closeButtonMarker = createMarkerView.findViewById(R.id.closeButton)
+        errorText = createMarkerView.findViewById(R.id.errorText)
+        errorText.visibility = View.GONE
+
+        dialogBuilder.setView(createMarkerView)
+        val dialog = dialogBuilder.create()
+        dialog.show()
+
+        createButton.setOnClickListener {
+            if (placeName.text.isNotEmpty() && placeDescription.text.isNotEmpty()) {
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title(placeName.text.toString())
+                        .snippet(placeDescription.text.toString())
+                        .icon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)))
+                )
+                dialog.hide()
+            }
+            else {
+                errorText.text = "Please fill both fields"
+                errorText.visibility = View.VISIBLE
+            }
+        }
+
+        closeButtonMarker.setOnClickListener {
+            dialog.hide()
         }
     }
 
@@ -133,15 +194,15 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
         task.addOnSuccessListener { result ->
             val place = result.place
             val dialogBuilder = AlertDialog.Builder(this)
-            val contactPopupView = layoutInflater.inflate(R.layout.popup, null)
-            val popupBuilder = PopupBuilder(contactPopupView, place, placesClient, applicationContext)
+            val popupView = layoutInflater.inflate(R.layout.popup, null)
+            val popupBuilder = PopupBuilder(popupView, place, placesClient, applicationContext, layoutInflater)
             popupBuilder.build()
 
-            dialogBuilder.setView(contactPopupView)
+            dialogBuilder.setView(popupView)
             val dialog = dialogBuilder.create()
             dialog.show()
 
-            closeButton = contactPopupView.findViewById(R.id.closeButton)
+            closeButton = popupView.findViewById(R.id.closeButton)
 
             //Hide popup if close button is clicked
             closeButton.setOnClickListener {
