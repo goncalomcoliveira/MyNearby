@@ -223,7 +223,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
         }.addOnFailureListener { exception: Exception ->
             if (exception is ApiException) {
                 val statusCode = exception.statusCode
-                Log.e(ContentValues.TAG, "Error occurred while fetching place details! Status Code: $statusCode");
+                Log.e(ContentValues.TAG, "Error occurred while fetching place details! Status Code: $statusCode")
             }
         }
     }

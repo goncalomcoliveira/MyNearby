@@ -356,7 +356,7 @@ class PopupBuilder(private val context: Context, private val placesClient: Place
                     }.addOnFailureListener { exception: Exception ->
                         if (exception is ApiException) {
                             val statusCode = exception.statusCode
-                            Log.e(TAG, "Error occurred while fetching photo metadata! Status Code: $statusCode");
+                            Log.e(TAG, "Error occurred while fetching photo metadata! Status Code: $statusCode")
                         }
                     }
             }
