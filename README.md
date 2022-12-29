@@ -59,7 +59,9 @@ If the user desires to **explore a place near their location** that is already i
 
 - Location Status (Open, Closed, Permanently Closed);
 
-- Establishment schedule for the current weekday.
+- Establishment schedule for the current weekday;
+
+- Carousel of the location's photos. 
 
 The pop-up window's layout also depends on the information in the database, thus only displaying the existing information in an ordered and convenient manor.
 
