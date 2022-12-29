@@ -95,7 +95,7 @@ In the event of the user losing track of their current position, they can **pres
 
 #
 
-### **3. Case Study**
+## **3. Case Study**
 
 As previously mentioned, this being my first time developing an Android app, a lot had to be **researched and learned** before I could fully develop a functioning application with the features I had invisioned. Among others, these are some of the concepts and skills I can recognize I am more confortable working with following this learning experience:
 
