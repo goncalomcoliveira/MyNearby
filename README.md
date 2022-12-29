@@ -1,10 +1,16 @@
-# **MyNearby**
+# **MyNearby**, a "Meet Your Surroundings" Demo App
 
 ## **1. Introduction**
 
----
+Developed over the course of a week, **MyNearby** is an Android navegation demo app that shows noteworthy **points of interest (POIs)** around your current location, incentivizing **exploration** and offering **quick feedback** on what could be interesting to get to know about your surroundings.
+
+This application was built with the **Android SDK**, scritped in **Kotlin** and using the **Google Maps API**'s tools, with the intent of being a learning project for me, who had never utilized any of these before in my coding journey.
+
+#
 
 ## **2. Functionalities**
+
+With the aim of providing a **seamless and useful** experience to the users, I developed the funtionalities I saw fit for **what the application needed** and that **would be helpful** when navigating the map.
 
 #
 
@@ -18,13 +24,13 @@ Should the user want or need to **create a new marker**, to, for example, in a m
 
 - Completing the task by clicking the "Create New Place" button.
 
-The marker will then appear on the map and can be pressed in order to check the information given by the user in the **info window**.
+The marker will then appear on the map and can be pressed in order to check the information input by the user in the **info window**.
 
 <table style="margin-left: auto; margin-right: auto;">
     <tr>
-        <td><img src="docs/create_new_place.gif" width="200"></td>
-        <td><img src="docs/create_new_place_error.gif" width="200"></td>
-        <td><img src="docs/create_new_place_check.gif" width="200"></td> 
+        <td><img src="docs/create_new_place.gif" width="235"></td>
+        <td><img src="docs/create_new_place_error.gif" width="235"></td>
+        <td><img src="docs/create_new_place_check.gif" width="235"></td> 
     </tr>
     <tr>
         <td><b>2.1.1</b> Creating new place</td>
@@ -37,23 +43,23 @@ The marker will then appear on the map and can be pressed in order to check the 
 
 ### **2.2 Create New Place**
 
-If the user desires to explore a place near their location that is already in the Google Maps database, they can click one of the pre-disposed POI markers to prompt a pop-up displaying pertinent information about that place, such as:
+If the user desires to **explore a place near their location** that is already in the **Google Maps** database, they can **click** one of the **pre-disposed POI markers** to prompt a pop-up displaying pertinent information about that place, such as:
 
-- Location's name;
+- Location name;
 
-- Location's type (Restaurant, Bus Station, etc.);
+- Location type (Restaurant, Bus Station, etc.);
 
 - User ratings and rating amount;
 
-- Establishment's price assessment;
+- Establishment price assessment;
 
-- Location's address;
+- Location address;
 
 - Delivery/Dining options;
 
-- Location's Status (Open, Closed, Permanently Closed);
+- Location Status (Open, Closed, Permanently Closed);
 
-- Establishment's schedule for the current weekday.
+- Establishment schedule for the current weekday.
 
 The pop-up window's layout also depends on the information in the database, thus only displaying the existing information in an ordered and convenient manor.
 
@@ -80,11 +86,27 @@ In the event of the user losing track of their current position, they can **pres
 
 <table style="margin-left: auto; margin-right: auto;">
     <tr>
-        <td><img src="docs/return_to_location.gif" width="200"></td>
+        <td><img src="docs/return_to_location.gif" width="250"></td>
     </tr>
     <tr>
-        <td><b>2.1.1</b> Go to Current Location</td>
+        <td><b>2.3.1</b> Go to Current Location</td>
     </tr>
 </table>
 
 #
+
+### **3. Case Study**
+
+As previously mentioned, this being my first time developing an Android app, a lot had to be **researched and learned** before I could fully develop a functioning application with the features I had invisioned. Among others, these are some of the concepts and skills I can recognize I am more confortable working with following this learning experience:
+
+- Programming in Kotlin;
+
+- Android Studio's file structure;
+
+- Android's Activity components;
+  
+- Anroid's layout design (Different layouts, View Elements, Toast, Dialogs, etc.)
+
+- Permission requests and handling;
+  
+- Google Maps API and other associated API's (Google Maps Places).
