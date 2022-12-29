@@ -1,9 +1,9 @@
 package com.example.mynearby
 
-import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.Color
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
@@ -17,7 +17,18 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import java.util.*
 import kotlin.math.roundToInt
 
-class PopupBuilder(private val contactPopupView : View, private val place: Place, private val placesClient: PlacesClient, private val context: Context, private val layoutInflater: LayoutInflater) {
+
+/**
+ * Class tasked with setting up the place details' pop-up window [View] elements in the respective
+ * layout with the input place information.
+ *
+ * @param context main application's context
+ * @param placesClient place information retrieving client
+ * @param place pop-up window's information respective place
+ * @param contactPopupView layout to format with place information
+ * @author Gonçalo Oliveira
+ */
+class PopupBuilder(private val context: Context, private val placesClient: PlacesClient, private val place: Place, private val contactPopupView : View) {
 
     //popup fields
     private lateinit var popupTitle: TextView
@@ -120,6 +131,7 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
     }
 
     private fun setRating(){
+
         if (place.rating != null) {
             rating.text = place.rating?.toString()
 
@@ -141,29 +153,38 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
     private fun setStars() {
         val stars = listOf(star1, star2, star3, star4, star5)
 
-        for (i in 0 until place.rating.roundToInt()) {
-            stars[i].setColorFilter(Color.argb(255, 15,185,212))
+        val rating = place.rating
+
+        if (rating != null) {
+            for (i in 0 until rating.roundToInt()) {
+                stars[i].setColorFilter(Color.argb(255, 15,185,212))
+            }
         }
     }
 
     private fun setRatingsTotal() {
-        if (place.userRatingsTotal != null)
-            ratingsAmount.text = "(" + place.userRatingsTotal + ")"
+        if (place.userRatingsTotal != null) {
+            val ratingsAmountText = "(" + place.userRatingsTotal + ")"
+            ratingsAmount.text = ratingsAmountText
+        }
         else
             ratingsAmount.visibility = View.GONE
     }
 
     private fun setPrice() {
-        if (place.priceLevel != null) {
-            when (place.priceLevel) {
+
+        val priceLevel = place.priceLevel
+
+        if (priceLevel != null) {
+            when (priceLevel) {
                 0 -> {
                     priceDot.visibility = View.GONE
                     price.visibility = View.GONE
                 }
-                1 -> price.text = "$"
-                2 -> price.text = "$$"
-                3 -> price.text = "$$$"
-                4 -> price.text = "$$$$"
+                1 -> price.text = context.getString(R.string.price_l1)
+                2 -> price.text = context.getString(R.string.price_l2)
+                3 -> price.text = context.getString(R.string.price_l3)
+                4 -> price.text = context.getString(R.string.price_l4)
             }
         }
         else {
@@ -221,18 +242,21 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
     }
 
     private fun setBusinessStatus() {
-        if (place.businessStatus != null) {
-            when (place.businessStatus) {
+
+        val businessStatus = place.businessStatus
+
+        if (businessStatus != null) {
+            when (businessStatus) {
                 Place.BusinessStatus.CLOSED_PERMANENTLY -> {
-                    scheduleState.text = "Closed Permanently"
+                    scheduleState.text = context.getString(R.string.closed_permanently)
                     scheduleState.setTextColor(Color.argb(255, 255,76,76))
                 }
                 Place.BusinessStatus.CLOSED_TEMPORARILY -> {
-                    scheduleState.text = "Closed"
+                    scheduleState.text = context.getString(R.string.closed)
                     scheduleState.setTextColor(Color.argb(255, 255,191,0))
                 }
                 Place.BusinessStatus.OPERATIONAL -> {
-                    scheduleState.text = "Open"
+                    scheduleState.text = context.getString(R.string.open)
                     scheduleState.setTextColor(Color.argb(255, 52,191,73))
                 }
             }
@@ -245,7 +269,9 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
 
     private fun setWeekDayHours() {
 
-        if (place.openingHours != null && place.businessStatus != Place.BusinessStatus.CLOSED_PERMANENTLY) {
+        val openingHours = place.openingHours
+
+        if (openingHours != null && place.businessStatus != Place.BusinessStatus.CLOSED_PERMANENTLY) {
 
             val calendar = Calendar.getInstance()
             var dayOfWeek = 0
@@ -282,7 +308,7 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
                 }
             }
 
-            scheduleTime.text = place.openingHours.weekdayText[dayOfWeek].removePrefix(excludeText)
+            scheduleTime.text = openingHours.weekdayText[dayOfWeek].removePrefix(excludeText)
         }
         else {
             scheduleDot.visibility = View.GONE
@@ -298,9 +324,12 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
     }
 
     private fun setPhotos() {
-        if (place.photoMetadatas != null) {
 
-            for (photoMetadata in place.photoMetadatas) {
+        val photoMetadatas = place.photoMetadatas
+
+        if (photoMetadatas != null) {
+
+            for (photoMetadata in photoMetadatas) {
 
                 val photoRequest = FetchPhotoRequest.builder(photoMetadata)
                     .setMaxWidth(500) // Optional.
@@ -327,7 +356,7 @@ class PopupBuilder(private val contactPopupView : View, private val place: Place
                     }.addOnFailureListener { exception: Exception ->
                         if (exception is ApiException) {
                             val statusCode = exception.statusCode
-                            TODO("Handle error with given status code.")
+                            Log.e(TAG, "Error occurred while fetching photo metadata! Status Code: $statusCode");
                         }
                     }
             }

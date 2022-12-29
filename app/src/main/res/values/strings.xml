@@ -1,5 +1,20 @@
 <resources>
+    <string name="API_KEY">AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4</string>
     <string name="app_name">MyNearby</string>
     <string name="title_activity_maps">MyNearby</string>
     <string name="search_a_location">Search a Location</string>
+    <string name="new_marker_error_msg">Please fill both fields</string>
+    <string name="price_l1">$</string>
+    <string name="price_l2">$$</string>
+    <string name="price_l3">$$$</string>
+    <string name="price_l4">$$$$</string>
+    <string name="closed_permanently">Closed Permanently</string>
+    <string name="closed">Closed</string>
+    <string name="open">Open</string>
+    <string name="new_place_info">New Place Info:</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="error_message">Error Message</string>
+    <string name="create_new_place">Create New Place</string>
+    <string name="dot">•</string>
 </resources>

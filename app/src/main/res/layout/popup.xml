@@ -18,7 +18,7 @@
         android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:layout_marginBottom="-36dp"
         android:adjustViewBounds="true"
         android:background="@null"
@@ -30,9 +30,8 @@
         android:id="@+id/popupTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="53dp"
+        android:layout_marginEnd="53dp"
         android:paddingBottom="5dp"
-        android:text="Sabor Do Porto"
         android:textColor="@color/text_light_mode"
         android:textSize="28sp" />
 
@@ -41,7 +40,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
-        android:text="Restaurante, Bar"
         android:textColor="@color/text_gray"
         android:textSize="16sp"
         tools:visibility="visible" />
@@ -60,7 +58,6 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:paddingEnd="5dp"
-            android:text="4,0"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -131,7 +128,6 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:paddingStart="3dp"
-            android:text="(46)"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -143,7 +139,7 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="5dp"
-            android:text="•"
+            android:text="@string/dot"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -153,7 +149,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="€€"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -164,7 +159,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
-        android:text="R. das Ribeiras 342"
         android:textColor="@color/text_gray"
         android:textSize="16sp"
         tools:visibility="visible" />
@@ -182,7 +176,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Comer no local"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -194,7 +187,7 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="5dp"
-            android:text="•"
+            android:text="@string/dot"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -204,7 +197,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Take away"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -216,7 +208,7 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="5dp"
-            android:text="•"
+            android:text="@string/dot"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -226,7 +218,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Não faz entregas"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -245,7 +236,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Aberto"
             android:textColor="@color/blue_dacnis_mid"
             android:textSize="16sp" />
 
@@ -257,7 +247,7 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="5dp"
-            android:text="•"
+            android:text="@string/dot"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -267,7 +257,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Fecha às 22:00"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
 
@@ -278,7 +267,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
-        android:text="914 032 099"
         android:textColor="@color/text_gray"
         android:textSize="16sp" />
 

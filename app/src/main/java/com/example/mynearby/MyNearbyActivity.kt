@@ -2,9 +2,11 @@ package com.example.mynearby
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mynearby.databinding.ActivityMapsBinding
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -30,6 +33,13 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import java.util.*
 import kotlin.properties.Delegates
 
+/**
+ * Main Activity of the MyNearby application, tasked with setting up the needed permissions,
+ * preparing the map view, notifying when it is ready and setting the rest of the app specific
+ * functionalities
+ *
+ * @author Gonçalo Oliveira
+ */
 class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -53,7 +63,6 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var createButton: Button
     private lateinit var closeButtonMarker: ImageButton
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,7 +79,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun initPlaces() {
         if (!Places.isInitialized())
-            Places.initialize(applicationContext, "AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4");
+            Places.initialize(applicationContext, getString(R.string.API_KEY))
 
         placesClient = Places.createClient(this)
     }
@@ -104,14 +113,15 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.position, 17f))
         }
 
-        setPOIOnClickPopup()
+        setOnClickListeners()
     }
 
     /**
-     * Sets listeners on the present POI [Marker]s so, when clicked, they call the
-     * TODO Finish doc
+     * Sets listeners on the present POI [Marker]s so, when clicked, they call the pop-up window
+     * function [showPlacePopup], sets listeners on the map so the user can create their own
+     * [Marker]s by calling the function [createPersonalMarker].
      */
-    private fun setPOIOnClickPopup() {
+    private fun setOnClickListeners() {
 
         val placeFields = listOf(
             Place.Field.NAME,
@@ -144,7 +154,8 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
-     * TODO Write doc
+     * Show the personal [Marker] creation fields as a popup [AlertDialog], assert both fields are
+     * filled and place the [Marker] with the input information in the map.
      */
     private fun createPersonalMarker(latLng: LatLng) {
         val dialogBuilder = AlertDialog.Builder(this)
@@ -173,7 +184,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 dialog.hide()
             }
             else {
-                errorText.text = "Please fill both fields"
+                errorText.text = getString(R.string.new_marker_error_msg)
                 errorText.visibility = View.VISIBLE
             }
         }
@@ -185,8 +196,8 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
 
     /**
      * Create a [FetchPlaceRequest] in order to retrieve the POI's [Place] details, run said request
-     * and create a new popup window to display the location's information using [PopupBuilder] if
-     * the request task is successful
+     * and create a new popup window to display the location's information as an [AlertDialog] using
+     * [PopupBuilder] if the request task is successful
      */
     private fun showPlacePopup(poi: PointOfInterest, placeFields: List<Place.Field>, token: AutocompleteSessionToken) {
         val fetchRequest = FetchPlaceRequest.builder(poi.placeId, placeFields).setSessionToken(token).build()
@@ -195,7 +206,7 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
             val place = result.place
             val dialogBuilder = AlertDialog.Builder(this)
             val popupView = layoutInflater.inflate(R.layout.popup, null)
-            val popupBuilder = PopupBuilder(popupView, place, placesClient, applicationContext, layoutInflater)
+            val popupBuilder = PopupBuilder(applicationContext, placesClient, place, popupView)
             popupBuilder.build()
 
             dialogBuilder.setView(popupView)
@@ -209,8 +220,11 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 dialog.hide()
             }
 
-        }.addOnFailureListener {
-            Toast.makeText(applicationContext, "Failed to retrieve this location's details.", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener { exception: Exception ->
+            if (exception is ApiException) {
+                val statusCode = exception.statusCode
+                Log.e(ContentValues.TAG, "Error occurred while fetching place details! Status Code: $statusCode");
+            }
         }
     }
 
@@ -299,20 +313,5 @@ class MyNearbyActivity : AppCompatActivity(), OnMapReadyCallback {
                 },
                 Looper.getMainLooper()
             )
-    }
-
-    /**
-     * TODO Write doc
-     */
-    fun markNewCurrentPosition(latitude: Double, longitude: Double) {
-        currentMarker.remove()
-        val latLng = LatLng(latitude, longitude)
-        currentMarker = mMap.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .title("Current Location")
-                .snippet("You are here!")
-        )!!
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
     }
 }

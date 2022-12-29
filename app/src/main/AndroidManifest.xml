@@ -22,7 +22,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBQfnnShij4yYUocf4Pa1o-wzgzT6pB2R4" /> <!-- Inserted Google Maps API credential -->
+            android:value="@string/API_KEY" /> <!-- Inserted Google Maps API credential -->
 
         <activity
             android:name=".MyNearbyActivity"
