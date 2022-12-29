@@ -84,7 +84,7 @@ The pop-up window's layout also depends on the information in the database, thus
 
 ### **2.3 Return to Current Location**
 
-In the event of the user losing track of their current position, they can **press the button** on the **bottom right corner** to quickly return to it.
+In the event of the user losing track of their current position, they can **press the button** on the **bottom of the screen** to quickly return to it.
 
 <table style="margin-left: auto; margin-right: auto;">
     <tr>
