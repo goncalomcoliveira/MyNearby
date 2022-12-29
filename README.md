@@ -6,6 +6,7 @@
 
 ## **2. Functionalities**
 
+#
 
 ### **2.1 Create New Place**
 
@@ -32,6 +33,7 @@ The marker will then appear on the map and can be pressed in order to check the 
     </tr>
 </table>
 
+#
 
 ### **2.2 Create New Place**
 
@@ -70,6 +72,7 @@ The pop-up window's layout also depends on the information in the database, thus
     </tr>
 </table>
 
+#
 
 ### **2.3 Return to Current Location**
 
@@ -80,6 +83,8 @@ In the event of the user losing track of their current position, they can **pres
         <td><img src="docs/return_to_location.gif" width="200"></td>
     </tr>
     <tr>
-        <td><b>2.1.1</b> Return to Current Location</td>
+        <td><b>2.1.1</b> Go to Current Location</td>
     </tr>
 </table>
+
+#
